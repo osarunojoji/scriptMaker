@@ -55,9 +55,7 @@ Array = [y+ArrayOnly[0],y+ArrayOnly[1],y+ArrayOnly[2],y+ArrayOnly[3],y+ArrayOnly
 function showpages2() {
  $('#close1').hide();
  $('#imgs').hide();
-     status = 0;
-	    showpages();
-    break;
+showpages();
 }
 function showpages() {
  $('#close1').show();
