@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja" dir="ltr">
+<head>
+  <meta charset="UTF-8"> 
+  <title>AK_typingGame</title>
+  <style type="text/css"> 
+    #characters {
+  	
+    	}
+    #start { 
+     font-weight:bold; 
+     width: 100%;
+     height: 50px; 
+     font-size:20px;
+     padding: 7px 20px;
+     border-radius: 25px; 
+     text-decoration: none; 
+     text-align: center;
+     color: blue;
+     background-image: 
+     linear-gradient(45deg,   
+     #FFC107 0%, #ff8b5f 100%); 
+     transition: .4s; 
+    }
+   	#reset {
+   	 font-weight:bold; 
+     width: 100%;
+     height: 50px; 
+     font-size:20px;
+     padding: 7px 20px;
+     border-radius: 25px; 
+     text-decoration: none; 
+     text-align: center;
+     color: red;
+     background-image: 
+     linear-gradient(45deg,   
+     #FFC107 0%, #ff8b5f 100%); 
+     transition: .4s; 
+   	}
+  	 #characters { 
+     font-size: 2rem; 
+   	} 
+   #untyped {
+    font-weight:bold; 
+   }
+   #typed {
+   font-weight:bold; 
+  	  color: red; 
+   	 
+  	 } 
+   	@font-face {
+  	  font-family: 'DSEG';
+   	 src: 
+     url('./DSEG7-Classic/DSEG7Classic-Regular.ttf'); 
+   	} 
+   #time { 
+  	  font-family: 'DSEG';
+  	 }
+   .ModalLayer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    transition: opacity 0.50s;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10000;
+   }
+   .ModalLayer.isShow {
+    transition: opacity 0.50s;
+    pointer-events: auto;
+    opacity: 1;
+   }
+   .ModalLayer-Mask {
+    position: absolute;
+    background: rgba(123,123,123,0.5);
+    width: 100%;
+    height: 100vh;
+   }
+   .ModalLayer-Inner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    max-width: 9999px;
+    transform: translate(-50%, -50%);
+   } 
+   @media screen and (max-width: 768px) {
+    .ModalLayer-Inner {
+     padding-left: 24px;
+     padding-right: 24px;
+    }
+   }
+   .ModalSection {
+    background: white;
+   }
+   .Modal-Inner {
+    border-top: 0px solid #5bc8ac;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 80px;
+    max-width: 500px;
+   }
+   .Modal-Inner-Headline {
+    text-align: center;
+    font-size: 50px;
+   }
+  </style>
+  <script type="text/javascript"  
+  src="https://code.jquery.com/jquery-1.12.4.js">
+  </script>
+</head>
+<body>
+ <div class="ModalLayer">
+  <div class="ModalLayer-Mask">
+   <div class="ModalLayer-Inner">
+    <div class="ModalSection">
+      <div class="Modal">
+        <div class="Modal-Inner-Headline" 
+            id="firstCountDown">
+        </div>
+       </div>
+      </div>
+    </div>
+  </div>
+ </div>
+	<div id="overlay">
+		これはテスト版です<br><br>
+		残り時間:
+  <div id="time">
+   00:00:00.000
+  </div>
+  <div id="characters">
+  	 <p></p><br><br>
+   <span id="typed"></span><span id="untyped">スタートボタンで開始</span>
+   <p></p><br><br>
+  </div> 
+  <div id="result"></div>
+   <input id="start" type="button" value="start" class="JS_Click_ShowModal_Trigger">
+   <p></p>
+   <input id="reset" type="button" value="reset">    
+ </div>
+ <p></p><br><br><br>
+ <span>エスケープキー : リセット</span><br>
+ <span>エンターキー : スタート</span>
+ <script type="text/javascript">
+  	var cheat_bool;
+  	cheat_bool = false;
+  	function cheat() {
+    cheat_bool = true;
+  		return '成功w';
+  	}
+  	const strs = [ 
+   'sex',
+   'hasimotosine',
+   'fuck',
+   'I like to play sex',
+   'I went to the park to play penis'
+  ]; 
+  let startOnclick = false;
+  const timeElement = document.getElementById('time');
+  const start = document.getElementById('start');
+  const reset = document.getElementById('reset');
+  const result = document.getElementById('result');
+  const typedField = document.getElementById('typed');
+  const untypedField = document.getElementById('untyped');
+  const firstCountDown = document.getElementById("firstCountDown");
+  let time = 30000;
+  let missTypeCount = 0;
+  let successTypeCount = 0;
+  function randomInt(max) {
+   return Math.floor(Math.random() * Math.floor(max));
+  } 
+  function nextString() {
+  const idx = randomInt(strs.length);
+  return strs[idx];
+  } 
+  function updateTextField(){ 
+  typedField.textContent = typed; 
+  untypedField.textContent = untyped; 
+  } 
+  function next() { 
+   typed = ''; 
+   untyped = nextString(); 
+   updateTextField(); 
+  } 
+  function updateTime() { 
+   const ms = remaining % 1000;
+   const s = Math.floor(remaining / 1000) % 60; const m = Math.floor(remaining / (1000*60)) % 60;
+   const h = Math.floor(remaining / (1000*60*60));
+   const msStr = ms.toString().padStart(3, '0');
+   const sStr = s.toString().padStart(2, '0');
+   const mStr = m.toString().padStart(2, '0');
+   const hStr = h.toString().padStart(2, '0');
+   timeElement.innerHTML = `${hStr}:${mStr}:${sStr}.${msStr}`;
+   }
+   function keyDownCallback(e) { 
+    if (e.key !== untyped.substring(0, 1)) { 
+     missTypeCount += 1; 
+     return; 
+     } 
+     successTypeCount += 1; 
+     typed += untyped.substring(0, 1); 
+     untyped = untyped.substring(1); 
+     updateTextField();
+     if (untyped === '') {
+      next();  
+      }   
+     } 
+ function gameStart() {
+ let pre = new Date(); 
+ intervalId = setInterval(function() {
+ const now = new Date(); 
+ remaining -= now - pre; 
+ if (remaining < 0) { 
+ gameEnd(); 
+ }
+ pre = now;
+ updateTime();
+ }, 10); 
+document.addEventListener('keydown', keyDownCallback);
+next();
+}   
+function gameEnd() {
+remaining = 0; 
+updateTime(); 
+clearInterval(intervalId); 
+intervalId = null; document.removeEventListener('keydown', keyDownCallback); 
+let typed_score = successTypeCount-missTypeCount;
+if (cheat_bool == false) {
+result.textContent = '結果:ミスった数:'+missTypeCount+',正しく打った数:'+successTypeCount+', 得点:'+typed_score; 
+}else{
+result.textContent = '結果:ミスった数:0, 正しく打った数:99999, 得点:99999'; 
+}
+}
+let remaining = time;
+let intervalId = null;
+start.addEventListener('click', function(e) { 
+ startOnclickFunc();
+}); 
+
+
+function startOnclickFunc() {
+ if (intervalId !== null) { 
+  return; 
+ } 
+ if (startOnclick == false) {
+  $('.ModalLayer').addClass('isShow');
+  startOnclick = true;
+  gameStartTimeCount = 3;
+  untypedField.textContent = "準備!";
+  firstInterval =  
+  setInterval("gameStartTime()", 1000);
+ }
+}
+$(document).keyup(function(e) { 
+ if (e.key === "Enter") { 
+  startOnclickFunc();
+ } 
+});
+ 
+function gameStartTime() {
+ firstCountDown.textContent =   
+ gameStartTimeCount;
+ gameStartTimeCount--;
+ if (gameStartTimeCount == -1) {
+  untypedField.textContent = "開始!";
+ }
+	if (gameStartTimeCount == -2) {
+		clearInterval(firstInterval);
+		firstCountDown.textContent = '';
+	  $('.ModalLayer').removeClass('isShow');
+		gameStart();
+	}
+}
+reset.addEventListener('click', function(e) { 
+document.removeEventListener('keydown', keyDownCallback);
+resetLast();
+});
+$(document).keyup(function(e) { 
+ if (e.key === "Escape") { 
+  resetLast();
+ } 
+});
+function resetLast() {
+ clearInterval(intervalId);
+ intervalId = null;
+ remaining = time;
+ updateTime();
+ next();
+ if (startOnclick !== false) {
+  clearInterval(firstInterval);
+ }
+ startOnclick = false;
+ missTypeCount = 0;
+ successTypeCount = 0;
+ result.textContent = ''; 
+ firstCountDown.textContent = '';
+ typedField.textContent = '';
+ untypedField.textContent = 
+ 'スタートボタンで開始';
+}
+resetLast();
+</script>
+</body>
+</html>
